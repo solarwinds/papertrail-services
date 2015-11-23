@@ -9,7 +9,6 @@ class Service::Victorops < Service
       settings[:routing_key].to_s.empty?
 
     events = payload[:events]
-    hosts = events.collect { |e| e[:source_name] }.sort.uniq
     entity_id = payload[:saved_search][:name]
     entity_display_name = source_names(events, 5)
     state_message = "#{entity_id} (#{entity_display_name})"
