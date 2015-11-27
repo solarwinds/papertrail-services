@@ -139,7 +139,7 @@ DEPENDENCIES
   mocha
   net-http-persistent
   pg
-  puma (>= 2.15.3)
+  puma
   rack-timeout
   rake
   rushover
