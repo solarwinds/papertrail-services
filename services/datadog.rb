@@ -36,6 +36,9 @@ class Service::Datadog < Service
       req.params = {
         :api_key => settings[:api_key]
       }
+      req.headers = {
+        'Content-Type' => 'application/json'
+      }
       req.body = {
         :series => serieses
       }.to_json
