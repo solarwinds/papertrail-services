@@ -40,7 +40,7 @@ class Service::Mail < Service
     s = ''
 
     if html_search_url
-      url = html_search_url + '?' + { :time => received_at.to_i }.to_query
+      url = html_search_url + '?' + { :centered_on_id => message[:id] }.to_query
       s << "<a href=\"#{url}\" style=\"color:#444;\">#{received_at.strftime('%b %d %X')}</a>"
     else
       s << received_at.strftime('%b %d %X')
