@@ -6,7 +6,7 @@ class CloudWatchTest < PapertrailServices::TestCase
   def setup
     @common_settings = { aws_access_key_id: '123',
                          aws_secret_access_key: '456',
-                         namespace: "papertrail-test",
+                         metric_namespace: "papertrail-test",
                          metric_name: "test-metric",
                        }
     new_payload = payload # payload has some magic and can't be modified
