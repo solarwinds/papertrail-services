@@ -3,7 +3,6 @@ require 'aws-sdk'
 class Service::CloudWatch < Service
 
   def prepare_post_data(events, size_limit = 8192, max_days = 14)
-
     counts = event_counts_by_received_at(events)
 
     metric_data = counts.map do |time, count|
@@ -18,8 +17,14 @@ class Service::CloudWatch < Service
       }
     end
 
+    if settings[:metric_namespace].present?
+      metric_namespace = settings[:metric_namespace]
+    else
+      metric_namespace = 'Papertrail'
+    end
+
     post_data = {
-      namespace: settings[:namespace],
+      namespace: metric_namespace,
       metric_data: metric_data
     }
 
@@ -32,7 +37,7 @@ class Service::CloudWatch < Service
     else
       metric_data.each do |d| # one for each timestamp is as small as this can go
         post_data = {
-          namespace: settings[:namespace],
+          namespace: metric_namespace,
           metric_data: d
         }
         post_json = post_data.to_json
@@ -50,18 +55,11 @@ class Service::CloudWatch < Service
     required_settings = [:aws_access_key_id,
                          :aws_secret_access_key,
                          :aws_region,
-                         :namespace,
                          :metric_name,
                         ]
     required_settings.each do |setting|
       raise_config_error "Missing required setting #{setting}" if
         setting.to_s.empty?
-    end
-
-    if settings[:metric_namespace].present?
-      metric_namespace = settings[:metric_namespace]
-    else
-      metric_namespace = 'Papertrail'
     end
 
     cloudwatch = AWS::CloudWatch::Client.new(
