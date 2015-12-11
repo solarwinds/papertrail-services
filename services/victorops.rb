@@ -12,10 +12,13 @@ class Service::Victorops < Service
     entity_id = payload[:saved_search][:name]
     entity_display_name = source_names(events, 5)
     state_message = "#{entity_id} (#{entity_display_name})"
-    message = events.collect { |item|
+
+    syslog_events = events[0..25].collect { |item|
       syslog_format(item)
     }.join(", ")
-    message = message[0..1020] + "..." if message.length > 1024
+    if syslog_events.length > 1024
+      syslog_events = syslog_events[0..1020] + "..."
+    end
 
     if message.empty?
       raise_config_error "Could not process payload"
@@ -28,6 +31,7 @@ class Service::Victorops < Service
       message_type: (settings[:message_type] or "INFO"),
       timestamp: Time.iso8601(events[0][:received_at]).to_i,
       state_message: state_message,
+      events: syslog_events
     }
 
     url = "https://alert.victorops.com/integrations/generic/20131114/alert/#{settings[:token]}/#{settings[:routing_key]}"
