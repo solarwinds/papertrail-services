@@ -18,9 +18,7 @@ class Service::Victorops < Service
     }.join(", ")
     if syslog_events.length > 1024
       syslog_events = syslog_events[0..1020] + "..."
-    end
-
-    if message.empty?
+    elsif syslog_events.empty?
       raise_config_error "Could not process payload"
     end
 
