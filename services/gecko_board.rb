@@ -12,7 +12,7 @@ class Service::GeckoBoard < Service
   end
 
   def deliver(token, widget_key, value)
-    # http://docs.geckoboard.com/api/push.html
+    # https://developer.geckoboard.com/#pushing-to-your-widget 
     res = http_post URI.join("https://push.geckoboard.com/v1/send/", widget_key).to_s do |req|
       req.headers[:content_type] = 'application/json'
 
