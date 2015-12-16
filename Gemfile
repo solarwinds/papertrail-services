@@ -12,7 +12,7 @@ gem 'net-http-persistent'
 gem 'scrolls'
 
 gem 'metriks'
-gem 'metriks-librato_metrics', :git => 'https://github.com/eric/metriks-librato_metrics.git'
+gem 'metriks-librato_metrics'
 
 gem 'hoptoad_notifier'
 gem "sentry-raven"
