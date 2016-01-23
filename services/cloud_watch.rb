@@ -2,7 +2,7 @@ require 'aws-sdk'
 
 class Service::CloudWatch < Service
 
-  def prepare_post_data(events, size_limit = 8192, max_days = 14)
+  def prepare_post_data(events, metrics_per_request = 20, max_days = 14)
     counts = event_counts_by_received_at(events)
 
     metric_data = counts.map do |time, count|
@@ -23,32 +23,15 @@ class Service::CloudWatch < Service
       metric_namespace = 'Papertrail'
     end
 
-    post_data = {
-      namespace: metric_namespace,
-      metric_data: metric_data
-    }
-
-    ret = []
-
-    post_json = post_data.to_json
-
-    if post_json.length <= size_limit
-      ret << post_data
-    else
-      metric_data.each do |d| # one for each timestamp is as small as this can go
-        post_data = {
-          namespace: metric_namespace,
-          metric_data: d
-        }
-        post_json = post_data.to_json
-        if post_json.length > size_limit # pathological case
-          raise_config_error "Logs exceed CloudWatch payload limit of #{size_limit} bytes"
-        end
-        ret << post_json
-      end
+    requests = []
+    metric_data.each_slice(metrics_per_request) do |metric_data_slice|
+      requests << {
+        namespace: metric_namespace,
+        metric_data: metric_data_slice
+      }.to_json
     end
 
-    ret
+    requests
   end
 
   def receive_logs
