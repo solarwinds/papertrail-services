@@ -28,7 +28,7 @@ class Service::CloudWatch < Service
       requests << {
         namespace: metric_namespace,
         metric_data: metric_data_slice
-      }.to_json
+      }
     end
 
     requests
