@@ -23,15 +23,12 @@ class Service::CloudWatch < Service
       metric_namespace = 'Papertrail'
     end
 
-    requests = []
-    metric_data.each_slice(metrics_per_request) do |metric_data_slice|
+    metric_data.each_slice(metrics_per_request).map do |metric_data_slice|
       requests << {
         namespace: metric_namespace,
         metric_data: metric_data_slice
       }
     end
-
-    requests
   end
 
   def receive_logs
