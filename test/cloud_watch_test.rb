@@ -20,12 +20,6 @@ class CloudWatchTest < PapertrailServices::TestCase
                    new_payload)
   end
 
-  def test_size
-    assert_raises(PapertrailServices::Service::ConfigurationError) {
-      @svc.prepare_post_data(@svc.payload[:events], size_limit=8)
-    }
-  end
-
   def test_counts
     counts = @svc.event_counts_by_received_at(payload[:events])
     # Static value for counts based on current sample payload; will fail if payload is changed
