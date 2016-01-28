@@ -24,7 +24,7 @@ class Service::CloudWatch < Service
     end
 
     metric_data.each_slice(metrics_per_request).map do |metric_data_slice|
-      requests << {
+      {
         namespace: metric_namespace,
         metric_data: metric_data_slice
       }
