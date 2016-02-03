@@ -33,7 +33,7 @@ class Service::Neptune < Service
 
     unless resp.success?
       puts "Neptune: #{resp.body.to_s}"
-      raise_config_error "Failed to post to Victorops"
+      raise_config_error "Failed to post to Neptune."
     end
   end
 end
