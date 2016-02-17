@@ -113,7 +113,7 @@ class Service::Mail < Service
               <p>
                 <strong>Can we help?</strong>
                 <br />
-                support@papertrailapp.com - http://help.papertrailapp.com/
+                <a href="mailto:support@papertrailapp.com">support@papertrailapp.com</a> - <a href="http://help.papertrailapp.com/">help.papertrailapp.com</a>
               </p>
             </div>
           </div>
