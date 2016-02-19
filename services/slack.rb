@@ -5,17 +5,11 @@ class Service::Slack < Service
     raise_config_error "Slack webhook must point to Slack endpoint domain, typically slack.com" unless settings[:slack_url].to_s.match(/slack\.com|transposer\.io/)
 
     message = %{"#{payload[:saved_search][:name]}" search found #{Pluralize.new('match', :count => payload[:events].length)} — <#{payload[:saved_search][:html_search_url]}|#{payload[:saved_search][:html_search_url]}>}
-    attachment = format_content(payload[:events])
 
     data = {
       :text => message,
       :parse => 'none',
-      :attachments => [
-        {
-          :text => attachment,
-          :mrkdwn_in => ["text"]
-        }
-      ]
+      :attachments => build_attachments(payload[:events]),
     }
 
     http.headers['content-type'] = 'application/json'
@@ -27,8 +21,25 @@ class Service::Slack < Service
     end
   end
 
+  def build_attachments(events)
+    body = build_body(events)
+
+    [{
+      :text => format_text_attachment(body),
+      :mrkdwn_in => ["text"],
+      :fallback => body,
+    }]
+  end
+
+  def format_text_attachment(body)
+    # Provide some basic escaping of ``` in messages
+    body = body.gsub('```', '` ` `')
+
+    "```" + body + "```"
+  end
+
   # Slack truncates attachments at 8000 bytes
-  def format_content(events, limit = 7500)
+  def build_body(events, limit = 7500)
     body = ''
 
     events.each do |event|
@@ -40,9 +51,6 @@ class Service::Slack < Service
       end
     end
 
-    # Provide some basic escaping of ``` in messages
-    body = body.gsub('```', '` ` `')
-
-    "```" + body + "```"
+    body
   end
 end
