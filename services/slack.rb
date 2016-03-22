@@ -14,7 +14,7 @@ class Service::Slack < Service
       :parse => 'none'
     }
 
-    if !events.empty? && !dont_display_messages
+    if events.present? && !dont_display_messages
       attachment = format_content(events)
       data[:attachments] = [
         {
