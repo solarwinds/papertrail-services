@@ -14,7 +14,9 @@ class Service::SNS < Service
 
     begin
       payload[:events].each do |event|
-        topic.publish(event)
+        topic.publish(event.merge({
+          :default => syslog_format(event)
+        })
       end
     rescue AWS::SNS::Errors::AuthorizationError => e
       raise Service::ConfigurationError,
