@@ -14,7 +14,7 @@ class Service::SNS < Service
 
     begin
       payload[:events].each do |event|
-        topic.publish(event.to_json)
+        topic.publish(event)
       end
     rescue AWS::SNS::Errors::AuthorizationError => e
       raise Service::ConfigurationError,
