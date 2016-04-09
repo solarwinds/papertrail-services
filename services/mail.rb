@@ -12,7 +12,7 @@ class Service::Mail < Service
     @mail_message ||= begin
       mail = ::Mail.new
       mail.from    'Papertrail <support@papertrailapp.com>'
-      recipients = settings[:addresses].strip.split(/(?:,|\s)+/).map { |a| a.strip }
+      recipients = settings[:addresses].strip.split(/(?:,|\s|;)+/).map { |a| a.strip }
       mail.to      recipients
       mail['reply-to'] = recipients.join(', ')
       mail['X-Report-Abuse-To'] = 'support@papertrailapp.com'
