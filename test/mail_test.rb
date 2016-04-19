@@ -6,7 +6,7 @@ class MailTest < PapertrailServices::TestCase
   end
 
   def test_logs
-    svc = service(:logs, { :addresses => 'eric@sevenscale.com' }, payload)
+    svc = service(:logs, { :addresses => 'eric@papertrail.com' }, payload)
 
     svc.mail_message.perform_deliveries = false
 
@@ -14,11 +14,20 @@ class MailTest < PapertrailServices::TestCase
   end
 
   def test_mail_message
-    svc = service(:logs, { :addresses => 'eric@sevenscale.com' }, payload)
+    svc = service(:logs, { :addresses => 'eric@papertrail.com' }, payload)
 
     message = svc.mail_message
 
     assert_not_nil message
+  end
+
+  def test_mail_message_multiple_recipients
+    svc = service(:logs, { :addresses => 'eric@papertrail.com,troy@papertrail.com;larry@papertrail.com' }, payload)
+
+    message = svc.mail_message
+
+    expected = %w(eric@papertrail.com troy@papertrail.com larry@papertrail.com)
+    assert_equal expected, message.to
   end
 
   def test_html
