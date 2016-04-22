@@ -18,7 +18,7 @@ class Service::SNS < Service
           :default => syslog_format(event)
         }))
       end
-    rescue AWS::SNS::Errors::AuthorizationError => e
+    rescue AWS::SNS::Errors::AuthorizationError, AWS::SNS::Errors::NotFound => e
       raise Service::ConfigurationError,
         "Error sending to Amazon SNS: #{e.message}"
     rescue AWS::SNS::Errors::ServiceError => e
