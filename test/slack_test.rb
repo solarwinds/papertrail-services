@@ -24,14 +24,14 @@ class SlackTest < PapertrailServices::TestCase
     svc.receive_logs
   end
 
-  def test_format_content_with_truncation
+  def test_build_attachments
     long_payload = payload.dup
     long_payload[:events] *= 100
 
     slack = Service::Slack.new
-    message = slack.format_content(long_payload[:events])
-
-    assert message.length < 8000
+    attachment = slack.build_attachments(long_payload[:events])
+    assert attachment[0][:text].length < 8000
+    assert attachment[0][:fallback].length < 8000
   end
 
   def service(*args)

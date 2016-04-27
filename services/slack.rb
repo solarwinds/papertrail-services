@@ -11,18 +11,9 @@ class Service::Slack < Service
 
     data = {
       :text => message,
-      :parse => 'none'
+      :parse => 'none',
+      :attachments => build_attachments(payload[:events]),
     }
-
-    if events.present? && !dont_display_messages
-      attachment = format_content(events)
-      data[:attachments] = [
-        {
-          :text => attachment,
-          :mrkdwn_in => ["text"]
-        }
-      ]
-    end
 
     http.headers['content-type'] = 'application/json'
     response = http_post settings[:slack_url], data.to_json
@@ -33,8 +24,25 @@ class Service::Slack < Service
     end
   end
 
+  def build_attachments(events)
+    body = build_body(events)
+
+    [{
+      :text => format_text_attachment(body),
+      :mrkdwn_in => ["text"],
+      :fallback => body,
+    }]
+  end
+
+  def format_text_attachment(body)
+    # Provide some basic escaping of ``` in messages
+    body = body.gsub('```', '` ` `')
+
+    "```" + body + "```"
+  end
+
   # Slack truncates attachments at 8000 bytes
-  def format_content(events, limit = 7500)
+  def build_body(events, limit = 7500)
     body = ''
 
     events.each do |event|
@@ -46,9 +54,6 @@ class Service::Slack < Service
       end
     end
 
-    # Provide some basic escaping of ``` in messages
-    body = body.gsub('```', '` ` `')
-
-    "```" + body + "```"
+    body
   end
 end
