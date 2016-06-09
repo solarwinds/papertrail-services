@@ -2,7 +2,7 @@ require File.expand_path('../helper', __FILE__)
 
 class MattermostTest < PapertrailServices::TestCase
   def test_logs
-    svc = service(:logs, { :mattermost_url => "http://perdu.com/hooks/FakeHook" }, payload)
+    svc = service(:logs, { :mattermost_url => "http://www.fake-mattermost.com/hooks/FakeHook" }, payload)
 
     http_stubs.post '/hooks/FakeHook' do |env|
       [200, {}, '']
@@ -15,7 +15,7 @@ class MattermostTest < PapertrailServices::TestCase
     long_payload = payload.dup
     long_payload[:events] *= 100
 
-    svc = service(:logs, { :mattermost_url => "http://perdu.com/hooks/FakeHook" }, long_payload)
+    svc = service(:logs, { :mattermost_url => "http://www.fake-mattermost.com/hooks/FakeHook" }, long_payload)
 
     http_stubs.post '/hooks/FakeHook' do |env|
       [200, {}, '']
@@ -38,7 +38,7 @@ class MattermostTest < PapertrailServices::TestCase
     empty_payload = payload.dup
     empty_payload[:events] = []
 
-    svc = service(:logs, { :mattermost_url => "http://perdu.com/hooks/FakeHook" }, empty_payload)
+    svc = service(:logs, { :mattermost_url => "http://www.fake-mattermost.com/hooks/FakeHook" }, empty_payload)
 
     post = false
     http_stubs.post '/hooks/FakeHook' do |env|
@@ -56,7 +56,7 @@ class MattermostTest < PapertrailServices::TestCase
   end
 
   def test_dont_display_messages
-    svc = service(:logs, { :dont_display_messages => 1, :mattermost_url => "http://perdu.com/hooks/FakeHook" }, payload)
+    svc = service(:logs, { :dont_display_messages => 1, :mattermost_url => "http://www.fake-mattermost.com/hooks/FakeHook" }, payload)
 
     post = false
     http_stubs.post '/hooks/FakeHook' do |env|
