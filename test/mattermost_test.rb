@@ -28,8 +28,8 @@ class MattermostTest < PapertrailServices::TestCase
     long_payload = payload.dup
     long_payload[:events] *= 100
 
-    slack = Service::Mattermost.new
-    attachment = slack.build_attachments(long_payload[:events])
+    mattermost = Service::Mattermost.new
+    attachment = mattermost.build_attachments(long_payload[:events])
     assert attachment[0][:text].length < 8000
     assert attachment[0][:fallback].length < 8000
   end

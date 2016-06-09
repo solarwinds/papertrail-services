@@ -1,5 +1,5 @@
 # encoding: utf-8
-class Service::Slack < Service
+class Service::Mattermost < Service
   def receive_logs
     raise_config_error 'Missing Mattermost URL' if settings[:mattermost_url].to_s.empty?
 
@@ -17,10 +17,10 @@ class Service::Slack < Service
     end
 
     http.headers['content-type'] = 'application/json'
-    response = http_post settings[:slack_url], data.to_json
+    response = http_post settings[:mattermost_url], data.to_json
 
     unless response.success?
-      puts "slack: #{payload[:saved_search][:id]}: #{response.status}: #{response.body}"
+      puts "mattermost: #{payload[:saved_search][:id]}: #{response.status}: #{response.body}"
       raise_config_error "Could not submit logs"
     end
   end
@@ -42,7 +42,7 @@ class Service::Slack < Service
     "```" + body + "```"
   end
 
-  # Slack truncates attachments at 8000 bytes
+  # Mattermost truncates attachments at 8000 bytes
   def build_body(events, limit = 7500)
     body = ''
 
