@@ -17,7 +17,7 @@ class MattermostTest < PapertrailServices::TestCase
 
     svc = service(:logs, { :mattermost_url => "https://mattermost.domain.com/hooks/HookID" }, long_payload)
 
-    http_stubs.post '/hooks/incoming-webhook' do |env|
+    http_stubs.post '/services/hooks/incoming-webhook' do |env|
       [200, {}, '']
     end
 
@@ -41,7 +41,7 @@ class MattermostTest < PapertrailServices::TestCase
     svc = service(:logs, { :mattermost_url => "https://mattermost.domain.com/hooks/HookID" }, empty_payload)
 
     post = false
-    http_stubs.post '/hooks/incoming-webhook' do |env|
+    http_stubs.post '/services/hooks/incoming-webhook' do |env|
       post = true
       body = JSON(env[:body])
 
@@ -59,7 +59,7 @@ class MattermostTest < PapertrailServices::TestCase
     svc = service(:logs, { :dont_display_messages => 1, :mattermost_url => "https://mattermost.domain.com/hooks/HookID" }, payload)
 
     post = false
-    http_stubs.post '/hooks/incoming-webhook' do |env|
+    http_stubs.post '/services/hooks/incoming-webhook' do |env|
       post = true
       body = JSON(env[:body])
 
