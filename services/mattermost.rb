@@ -1,31 +1,38 @@
 # encoding: utf-8
 class Service::Mattermost < Service
   def receive_logs
-    raise_config_error 'Missing Mattermost URL' if settings[:mattermost_url].to_s.empty?
-
-    display_messages = settings[:dont_display_messages].to_i != 1
-    events  = payload[:events]
-    message = %{"#{payload[:saved_search][:name]}" search found #{Pluralize.new('match', :count => payload[:events].length)} — <#{payload[:saved_search][:html_search_url]}|#{payload[:saved_search][:html_search_url]}>}
+    mattermost_url, display_messages = extract_from(settings)
+    raise_config_error 'Missing Mattermost URL' if mattermost_url.empty?
 
     data = {
-      :text => message,
-      :parse => 'none'
+      :text => build_message(payload),
+      :parse => 'none',
+      :attachments => build_attachments(payload[:events], display_messages)
     }
 
-    if events.present? && display_messages
-      data[:attachments] = build_attachments(payload[:events])
-    end
-
-    http.headers['content-type'] = 'application/json'
-    response = http_post settings[:mattermost_url], data.to_json
-
-    unless response.success?
-      puts "mattermost: #{payload[:saved_search][:id]}: #{response.status}: #{response.body}"
-      raise_config_error "Could not submit logs"
-    end
+    response = post(mattermost_url, data)
+    raise_if_needed(response, payload)
   end
 
-  def build_attachments(events)
+  private
+
+  def extract_from(settings)
+    [
+      settings[:mattermost_url].to_s,
+      (settings[:dont_display_messages].to_i != 1)
+    ]
+  end
+
+  def build_message(payload)
+    "#{payload[:saved_search][:name]} search found " \
+    "#{Pluralize.new('match', :count => payload[:events].length)} " \
+    "— <#{payload[:saved_search][:html_search_url]}|" \
+    "#{payload[:saved_search][:html_search_url]}>"
+  end
+
+  def build_attachments(events, display_messages)
+    return nil unless events.present? && display_messages
+
     body = build_body(events)
 
     [{
@@ -43,6 +50,8 @@ class Service::Mattermost < Service
   end
 
   # Mattermost truncates attachments at 8000 bytes
+  # I'm not sure it's the case for Mattermost
+  # I look at their code and didn't find any limitations
   def build_body(events, limit = 7500)
     body = ''
 
@@ -56,5 +65,20 @@ class Service::Mattermost < Service
     end
 
     body
+  end
+
+  def post(mattermost_url, data)
+    http.headers['content-type'] = 'application/json'
+    http_post mattermost_url, convert_to_json(data)
+  end
+
+  def convert_to_json(data)
+    data.reject{ |key, value| value.nil? }.to_json
+  end
+
+  def raise_if_needed(response, payload)
+    return if response.success?
+    puts "mattermost: #{payload[:saved_search][:id]}: #{response.status}: #{response.body}"
+    raise_config_error "Could not submit logs"
   end
 end
