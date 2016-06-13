@@ -28,10 +28,18 @@ class MattermostTest < PapertrailServices::TestCase
     long_payload = payload.dup
     long_payload[:events] *= 100
 
-    mattermost = Service::Mattermost.new
-    attachment = mattermost.build_attachments(long_payload[:events])
-    assert attachment[0][:text].length < 8000
-    assert attachment[0][:fallback].length < 8000
+    svc = service(:logs, { :mattermost_url => "http://www.fake-mattermost.com/hooks/FakeHook" }, long_payload)
+
+    http_stubs.post '/hooks/FakeHook' do |env|
+      body = JSON(env[:body])
+
+      assert body['attachments'][0]["text"].length < 8000
+      assert body['attachments'][0]["fallback"].length < 8000
+
+      [200, {}, '']
+    end
+
+    svc.receive_logs
   end
 
   def test_no_messages
