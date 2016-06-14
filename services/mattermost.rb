@@ -49,10 +49,10 @@ class Service::Mattermost < Service
     "```" + body + "```"
   end
 
-  # Mattermost truncates attachments at 8000 bytes
-  # I'm not sure it's the case for Mattermost
-  # I look at their code and didn't find any limitations
-  def build_body(events, limit = 7500)
+  # Mattermost truncates attachments at 3872 bytes
+  # It's written nowhere, but we found it by dicotomy
+  # Kudos us !!!
+  def build_body(events, limit = 3872)
     body = ''
 
     events.each do |event|
