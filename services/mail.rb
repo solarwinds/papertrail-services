@@ -82,7 +82,7 @@ class Service::Mail < Service
         </head>
         <body style="margin:0;padding:0;background:#fff;font-family:'Helvetica Neue', helvetica, arial, sans-serif;padding-bottom:30px;">
           <div class="hdr" style="padding:10px 20px;background:#00488F;margin:0;">
-            <img src="http://papertrailapp.com/images/papertrail-transparent-white-278x62.png" width="139" alt="" />
+            <img src="http://papertrailapp.com/images/pt-logo.png" width="150" alt="Papertrail" />
           </div>
           <div class="body" style="padding:15px 20px;">
 
