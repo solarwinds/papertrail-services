@@ -3,7 +3,24 @@
 # Initial implementation by Mike Heffner:
 #  https://github.com/librato/papertrail_pagerduty_webhook
 class Service::Pagerduty < Service
+  def json_limited(payload, size_limit)
+    ret = payload.to_json
+
+    while ret.length > size_limit
+      # This should only run once in the vast majority of cases, but the loop
+      # is necessary for pathological inputs
+      estimate = 0.9 * size_limit / ret.length
+      new_length = (payload[:events].length * estimate).floor
+      payload[:events] = payload[:events][0 .. new_length - 1]
+      ret = payload.to_json
+    end
+
+    ret
+  end
+
   def receive_logs
+    size_limit= 3145728 # PagerDuty specified 3mb as of Aug 2016
+
     events_by_incident_key = Hash.new do |h,k|
       h[k] = []
     end
@@ -46,7 +63,7 @@ class Service::Pagerduty < Service
       body[:details][:log_end_url] =
         "#{base_url}?centered_on_id=#{payload[:max_id]}"
 
-      resp = http_post "https://events.pagerduty.com/generic/2010-04-15/create_event.json", body.to_json
+      resp = http_post "https://events.pagerduty.com/generic/2010-04-15/create_event.json", json_limited(body.to_json, size_limit)
       unless resp.success?
         error_body = Yajl::Parser.parse(resp.body) rescue nil
 
