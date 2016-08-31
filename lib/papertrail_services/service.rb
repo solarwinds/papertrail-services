@@ -139,6 +139,21 @@ module PapertrailServices
       @ca_file ||= File.expand_path('../../../config/cacert.pem', __FILE__)
     end
 
+    def json_limited(payload, size_limit)
+      ret = payload.to_json
+
+      while ret.length > size_limit
+        # This should only run once in the vast majority of cases, but the loop
+        # is necessary for pathological inputs
+        estimate = 0.9 * size_limit / ret.length
+        new_length = (payload[:events].length * estimate).floor
+        payload[:events] = payload[:events][0 .. new_length - 1]
+        ret = payload.to_json
+      end
+
+      ret
+    end
+
     class TimeoutError < StandardError; end
     class ConfigurationError < StandardError; end
   end
