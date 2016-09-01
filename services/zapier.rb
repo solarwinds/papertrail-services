@@ -4,7 +4,7 @@ class Service::Zapier < Service
   attr_writer :zapier
 
   def receive_logs
-    size_limit= 5242880 # Zapier specified 5mb as of September 2015
+    size_limit = 5.megabytes # Zapier specified 5mb as of September 2015
     
     raise_config_error 'Missing Zapier URL' if
       settings[:url].to_s.empty?

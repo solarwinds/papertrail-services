@@ -5,7 +5,7 @@ class Service::Neptune < Service
     raise_config_error 'Missing Neptune API key' if
       settings[:api_key].to_s.empty?
 
-    size_limit= 5242880 # Neptune specified 5mb as of Feb 2016
+    size_limit = 5.megabytes # Neptune specified 5mb as of Feb 2016
 
     url = "https://www.neptune.io/api/v1/trigger/channel/papertrail/#{settings[:api_key]}"
     resp = http_post url do |req|

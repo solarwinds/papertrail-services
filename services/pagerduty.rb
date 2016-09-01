@@ -4,7 +4,7 @@
 #  https://github.com/librato/papertrail_pagerduty_webhook
 class Service::Pagerduty < Service
   def receive_logs
-    size_limit= 3145728 # PagerDuty specified 3mb as of Aug 2016
+    size_limit = 3.megabytes # PagerDuty specified 3mb as of Aug 2016
 
     events_by_incident_key = Hash.new do |h,k|
       h[k] = []
