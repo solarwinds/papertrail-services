@@ -8,10 +8,10 @@ class ZapierTest < PapertrailServices::TestCase
   end
 
   def test_size_limit
+    assert(payload.to_json.length > 1400, 'Test requires larger sample payload')
     svc = service(:logs, {:url => 'https://zapier.com/hooks/catch/sample_url/'},
                   payload)
     limited_payload = svc.json_limited(payload, 1400)
-    assert(payload.to_json.length > 1400)
     assert(limited_payload.length <= 1400)
   end
   
