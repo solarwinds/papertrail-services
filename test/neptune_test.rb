@@ -8,9 +8,9 @@ class NeptuneTest < PapertrailServices::TestCase
   end
 
   def test_size_limit
-    # This assumes the sample payload as of this writing, with a size of 1743
     svc = service(:logs, {:api_key => 'test_api_key'}, payload)
     limited_payload = svc.json_limited(payload, 1400)
+    assert(payload.to_json.length > 1400)
     assert(limited_payload.length <= 1400)
   end
 
