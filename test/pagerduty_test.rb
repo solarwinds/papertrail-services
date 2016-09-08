@@ -1,6 +1,13 @@
 require File.expand_path('../helper', __FILE__)
 
 class PagerdutyTest < PapertrailServices::TestCase
+  def test_size_limit
+    assert(payload.to_json.length > 1400, 'Test requires larger sample payload')
+    svc = service(:logs, { :service_key => 'k' }, payload)
+    limited_payload = svc.json_limited(payload, 1400)
+    assert(limited_payload.length <= 1400)
+  end
+
   def test_logs
     svc = service(:logs, { :service_key => 'k' }, payload)
 
