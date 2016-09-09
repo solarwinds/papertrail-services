@@ -4,8 +4,18 @@ class PagerdutyTest < PapertrailServices::TestCase
   def test_size_limit
     assert(payload.to_json.length > 1400, 'Test requires larger sample payload')
     svc = service(:logs, { :service_key => 'k' }, payload)
-    limited_payload = svc.json_limited(payload, 1400)
-    assert(limited_payload.length <= 1400)
+
+    # Run payload through pagerduty.rb, since it alters the JSON format.
+    body = nil
+    http_stubs.post '/generic/2010-04-15/create_event.json' do |env|
+      body = JSON(env[:body], symbolize_names: true)
+      [200, {}, '']
+    end
+    svc.receive_logs
+
+    assert(body.to_json.length > 600)
+    limited_body = svc.json_limited(body, 600, body[:details][:messages])
+    assert(limited_body.length <= 600)
   end
 
   def test_logs

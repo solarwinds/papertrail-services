@@ -48,7 +48,7 @@ class Service::Pagerduty < Service
       body[:details][:log_end_url] =
         "#{base_url}?centered_on_id=#{payload[:max_id]}"
 
-      resp = http_post "https://events.pagerduty.com/generic/2010-04-15/create_event.json", json_limited(body, size_limit)
+      resp = http_post "https://events.pagerduty.com/generic/2010-04-15/create_event.json", json_limited(body, size_limit, body[:details][:messages])
       unless resp.success?
         error_body = Yajl::Parser.parse(resp.body) rescue nil
 
