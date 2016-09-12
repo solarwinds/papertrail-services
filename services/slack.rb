@@ -2,7 +2,6 @@
 class Service::Slack < Service
   def receive_logs
     raise_config_error 'Missing slack webhook' if settings[:slack_url].to_s.empty?
-    raise_config_error "Slack webhook must point to Slack endpoint domain, typically slack.com" unless settings[:slack_url].to_s.match(/slack\.com|transposer\.io/)
 
     display_messages = settings[:dont_display_messages].to_i != 1
     events  = payload[:events]
