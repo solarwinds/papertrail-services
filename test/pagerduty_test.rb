@@ -13,6 +13,7 @@ class PagerdutyTest < PapertrailServices::TestCase
     end
     svc.receive_logs
 
+    assert_not_nil body
     assert(body.to_json.length > 600)
     limited_body = svc.json_limited(body, 600, body[:details][:messages])
     assert(limited_body.length <= 600)
