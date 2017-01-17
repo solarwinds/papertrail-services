@@ -42,8 +42,8 @@ class Service::Slack < Service
     "```" + body + "```"
   end
 
-  # Slack truncates attachments at 8000 bytes
-  def build_body(events, limit = 7500)
+  # Slack truncates attachments at 7000 bytes
+  def build_body(events, limit = 7000)
     body = ''
 
     events.each do |event|
