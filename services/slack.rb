@@ -53,8 +53,8 @@ class Service::Slack < Service
     body = ''
 
     events.each do |event|
-      message = syslog_format(event) + "\n"
-      if (body.length + message.length) < limit
+      message = syslog_format(event, limit - 1) + "\n"
+      if (body.length + message.length) <= limit
         body << message
       else
         break
