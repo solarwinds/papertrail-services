@@ -30,6 +30,10 @@ gem 'hipchat-api'
 # service :libratometrics
 gem 'librato-metrics', '~> 1.0.1', :require => "librato/metrics"
 
+# service :appoptics
+gem 'appoptics-api-ruby', :git => 'https://github.com/appoptics/appoptics-api-ruby',
+  :ref => '23fe88a', :require => "appoptics/metrics"
+
 # service :aws-sns
 gem 'aws-sdk', '~> 1.43.3'
 

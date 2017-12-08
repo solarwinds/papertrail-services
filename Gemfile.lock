@@ -1,3 +1,12 @@
+GIT
+  remote: https://github.com/appoptics/appoptics-api-ruby
+  revision: 23fe88a069efeefad3a32a7a87762238e6a77684
+  ref: 23fe88a
+  specs:
+    appoptics-api-ruby (2.1.4)
+      aggregate (~> 0.2.2)
+      faraday (~> 0.7)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -109,6 +118,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport (~> 3.0)
+  appoptics-api-ruby!
   aws-sdk (~> 1.43.3)
   faraday
   foreman
