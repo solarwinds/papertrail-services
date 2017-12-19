@@ -2,22 +2,18 @@
 require 'erb'
 
 class Service::Mail < Service
-  SEPARATOR = /[,;\s]+/
-
   def receive_logs
-    raise_config_error "No email addresses specified" if settings[:addresses].to_s.empty?
+    raise_config_error "No email addresses specified" if addresses.to_s.empty?
 
     mail_message.deliver
   end
 
   def mail_message
     @mail_message ||= begin
-      recipients = settings[:addresses].sub(/^#{SEPARATOR}/, '').split(SEPARATOR)
-
       mail = ::Mail.new
       mail.from 'Papertrail Alerts <alert@papertrailapp.com>'
-      mail.to recipients
-      mail['reply-to'] = recipients.join(', ')
+      mail.to recipient_list
+      mail['reply-to'] = recipient_list.join(", ")
       mail['X-Report-Abuse-To'] = 'support@papertrailapp.com'
       mail['List-Unsubscribe'] = "<#{payload[:saved_search][:html_edit_url]}>"
       mail.subject %{[Papertrail] "#{payload[:saved_search][:name]}" alert: #{Pluralize.new('match', :count => payload[:events].length)} (at #{alert_time})}
@@ -46,6 +42,24 @@ class Service::Mail < Service
 
   def event_count
     payload[:events].length
+  end
+
+  def recipient_list
+    recipients = recipient_addresses.select { |address| address.include?('@') }
+    unless recipients.present?
+      raise_config_error "No valid addresses found"
+    end
+    recipients
+  end
+
+  def recipient_addresses
+    ::Mail::AddressList.new(settings[:addresses]).addresses.map(&:address)
+  rescue ::Mail::Field::ParseError
+    settings[:addresses].tr(',;<>', ' ').split(' ')
+  end
+
+  def addresses
+    settings[:addresses]
   end
 
   def html_email
