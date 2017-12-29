@@ -67,6 +67,24 @@ class MailTest < PapertrailServices::TestCase
     assert_not_nil text
   end
 
+  def test_count_html
+    svc = service(:counts, { }, counts_payload)
+
+    html = svc.html_email
+
+    assert_not_nil html
+    assert_not_match("(root) CMD (/usr/lib/sa/sa1 -S DISK 1 1)", html)
+  end
+
+  def test_count_text
+    svc = service(:counts, { }, counts_payload)
+
+    text = svc.text_email
+
+    assert_not_nil text
+    assert_not_match("(root) CMD (/usr/lib/sa/sa1 -S DISK 1 1)", text)
+  end
+
   def service(*args)
     super Service::Mail, *args
   end

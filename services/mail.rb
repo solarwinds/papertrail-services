@@ -16,7 +16,7 @@ class Service::Mail < Service
       mail['reply-to'] = recipient_list.join(", ")
       mail['X-Report-Abuse-To'] = 'support@papertrailapp.com'
       mail['List-Unsubscribe'] = "<#{payload[:saved_search][:html_edit_url]}>"
-      mail.subject %{[Papertrail] "#{payload[:saved_search][:name]}" alert: #{Pluralize.new('match', :count => payload[:events].length)} (at #{alert_time})}
+      mail.subject %{[Papertrail] "#{payload[:saved_search][:name]}" alert: #{Pluralize.new('match', :count => event_count)} (at #{alert_time})}
 
       text = text_email
       html = html_email
@@ -41,7 +41,19 @@ class Service::Mail < Service
   end
 
   def event_count
-    payload[:events].length
+    if payload[:events]
+      payload[:events].length
+    else
+      count_event_count
+    end
+  end
+
+  def count_event_count
+    total = 0
+    payload[:counts].each do |source|
+      total += source[:timeseries].values.reduce(&:+)
+    end
+    total
   end
 
   def recipient_list
@@ -92,7 +104,7 @@ class Service::Mail < Service
             <%= frequency_phrase(payload[:frequency]) %>.
           </h3>
 
-          <%- if !payload[:events].empty? -%>
+          <%- if payload[:events] && !payload[:events].empty? -%>
           <div style="font-family:monaco,monospace,courier,'courier new';padding:4px;font-size:11px;border:1px solid #f1f1f1;border-bottom:0;">
             <%- payload[:events].each do |event| -%>
               <p style="line-height:1.5em;margin:0;padding:2px 0;border-bottom:1px solid #f1f1f1;">
@@ -128,7 +140,7 @@ class Service::Mail < Service
 
       <%= Pluralize.new('event', :count => event_count) %> matched your "<%= payload[:saved_search][:name] %>" search <%= frequency_phrase(payload[:frequency]) %>.
 
-      <%- if !payload[:events].empty? -%>
+      <%- if payload[:events] && !payload[:events].empty? -%>
         <%- payload[:events].each do |event| -%>
           <%= syslog_format(event) %>
         <%- end -%>
