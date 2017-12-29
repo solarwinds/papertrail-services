@@ -8,6 +8,10 @@ class Service::Mail < Service
     mail_message.deliver
   end
 
+  def receive_counts
+    receive_logs
+  end
+
   def mail_message
     @mail_message ||= begin
       mail = ::Mail.new
